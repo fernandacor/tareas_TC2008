@@ -29,7 +29,7 @@ class TreeCell(Agent):
         """
         If the tree is on fire, spread it to fine trees nearby.
         """
-        if self.condition == "Dead":
+        if self.condition == "Dead" or self.condition == "Alive":
             neighbors = []
             for neighbor in self.model.grid.iter_neighbors(self.pos, True):
                 if neighbor.pos[1] == self.pos[1] + 1:
