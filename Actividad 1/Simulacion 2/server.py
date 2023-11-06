@@ -1,5 +1,5 @@
 # Actividad 1: Automata Celular
-# Simulación 1
+# Simulación 2
 # Fernanda Cantú A01782232
 
 # Líbrerias a utilizar
@@ -45,6 +45,6 @@ model_params = {
 }
 
 # Definir qué se va a mostrar en la página al mismo tiempo y que se actualicen cuando el usuario interactue
-server = ModularServer(AutomataCelular, [canvas_element, tree_chart, pie_chart], "Automata Celular Simulación 1 - A01782232", model_params)
+server = ModularServer(AutomataCelular, [canvas_element, tree_chart, pie_chart], "Automata Celular Simulación 2 - A01782232", model_params)
 
 server.launch()
