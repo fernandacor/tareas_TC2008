@@ -1,14 +1,18 @@
+# Actividad 1: Automata Celular
+# Simulación 1
+# Fernanda Cantú A01782232
+
+# Líbrerias a utilizar
 from mesa.visualization import CanvasGrid, ChartModule, PieChartModule
 from mesa.visualization import ModularServer
 from mesa.visualization import Slider
 
 from model import AutomataCelular
 
-# The colors of the portrayal will depend on the cell's condition //
-COLORS = {"Alive": "#000000", "Dead": "#FF0000"}
+# Los colores dependen del estado de las células
+COLORS = {"Alive": "#000000", "Dead": "#FFFFFF"}
 
-# The portrayal is a dictionary that is used by the visualization server to
-# generate a visualization of the given agent.
+# Diccionario para generar la visualización del simulador
 def cell_automaton_portrayal(cell):
     if cell is None:
         return
@@ -20,17 +24,15 @@ def cell_automaton_portrayal(cell):
 
     return portrayal
 
-# The canvas element will be 500x500 pixels, with each cell being 5x5 pixels.
-# The portrayal method will fill each cell with a representation of the tree
-# that is in that cell.
+#nombreVariable = CanvasGrid(portrayal, grid_row, grid_columns, canvas_width, canvas_height)
 canvas_element = CanvasGrid(cell_automaton_portrayal, 50, 50, 500, 500)
 
-# The chart will plot the number of each type of tree over time.
+# Grafica para mostrar el número de células vivas y muertas con respecto al tiempo
 tree_chart = ChartModule(
     [{"Label": label, "Color": color} for label, color in COLORS.items()]
 )
 
-# The pie chart will plot the number of each type of tree at the current step.
+# Grafica para mostrar el número de células vivas y muertas en el paso actual
 pie_chart = PieChartModule(
     [{"Label": label, "Color": color} for label, color in COLORS.items()]
 )
@@ -42,11 +44,7 @@ model_params = {
     "density": Slider("Cell density", 0.15, 0.01, 0.5, 0.01),
 }
 
-# The modular server is a special visualization server that allows multiple
-# elements to be displayed simultaneously, and for each of them to be updated
-# when the user interacts with them.
-server = ModularServer(
-    AutomataCelular, [canvas_element, tree_chart, pie_chart], "Automata Celular Simulación 1 - A01782232", model_params
-)
+# Definir qué se va a mostrar en la página al mismo tiempo y que se actualicen cuando el usuario interactue
+server = ModularServer(AutomataCelular, [canvas_element, tree_chart, pie_chart], "Automata Celular Simulación 1 - A01782232", model_params)
 
 server.launch()
