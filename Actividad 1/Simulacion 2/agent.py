@@ -20,9 +20,9 @@ class TreeCell(Agent):
             pos: The tree's coordinates on the grid.
             model: standard model reference for agent.
         """
-        super().__init__(pos, model) # inicializa como vivo
+        super().__init__(pos, model) 
         self.pos = pos
-        self.condition = "Alive" 
+        self.condition = "Alive" or "Dead"
         self._next_condition = None
 
     def step(self):
@@ -57,28 +57,31 @@ class TreeCell(Agent):
                     neighbors[2].condition == "Dead")):
                     
                     self._next_condition = "Alive"
-                    
-                    # 0 0 0
-                elif ((neighbors[0].condition == "Dead" and 
-                    neighbors[1].condition == "Dead" and
-                    neighbors[2].condition == "Dead") or
-                    # el y del vecino es igual al y de self -1 es arriba
-                    # 0 1 0
-                    (neighbors[0].condition == "Dead" and
-                    neighbors[1].condition == "Alive" and
-                    neighbors[2].condition == "Dead") or
-                    
-                    # 1 0 1
-                    (neighbors[0].condition == "Alive" and
-                    neighbors[1].condition == "Dead" and
-                    neighbors[2].condition == "Alive") or
-                    
-                    # 1 1 1
-                    (neighbors[0].condition == "Alive" and
-                    neighbors[1].condition == "Alive" and
-                    neighbors[2].condition == "Alive")):
-                    
+                
+                else:
                     self._next_condition = "Dead"
+                    
+                #     # 0 0 0
+                # elif ((neighbors[0].condition == "Dead" and 
+                #     neighbors[1].condition == "Dead" and
+                #     neighbors[2].condition == "Dead") or
+                #     # el y del vecino es igual al y de self -1 es arriba
+                #     # 0 1 0
+                #     (neighbors[0].condition == "Dead" and
+                #     neighbors[1].condition == "Alive" and
+                #     neighbors[2].condition == "Dead") or
+                    
+                #     # 1 0 1
+                #     (neighbors[0].condition == "Alive" and
+                #     neighbors[1].condition == "Dead" and
+                #     neighbors[2].condition == "Alive") or
+                    
+                #     # 1 1 1
+                #     (neighbors[0].condition == "Alive" and
+                #     neighbors[1].condition == "Alive" and
+                #     neighbors[2].condition == "Alive")):
+                    
+                #     self._next_condition = "Dead"
                     
     
     def advance(self):

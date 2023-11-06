@@ -72,9 +72,9 @@ class AutomataCelular(Model):
         # collect data
         self.datacollector.collect(self)
 
-        self.i += 1
-        if self.i >= 49:
-            self.running = False
+        # self.i += 1
+        # if self.i >= 49:
+        #     self.running = False
 
 
     # staticmethod is a Python decorator that makes a method callable without an instance.
