@@ -7,7 +7,7 @@ from agent import CellCell
 
 class AutomataCelular(Model):
     """
-        Simulación 1 - Modelo de un Automata Celular
+        Simulación 2 - Modelo de un Automata Celular
         
         Atributos:
             height, width: Tamaño del grid
@@ -26,7 +26,6 @@ class AutomataCelular(Model):
         # Definir objetos del modelo
         self.schedule = SimultaneousActivation(self) # Objeto de mesa que corre todos los agentes al mismo tiempo
         self.grid = SingleGrid(height, width, torus=False) # Torus define si "the grid wraps or not"
-        self.i = 0 # Contador de pasos
 
         # DatatCollector es un objeto de mesa que sirve para recolectar datos del modelo
         self.datacollector = DataCollector(
@@ -39,7 +38,7 @@ class AutomataCelular(Model):
         # La densidad basicamente es la probabilidad de que haya una celula viva
         # coord_iter itera sobre, y regresa, las posiciones y el contenido de cada celda
         for contents, (x, y) in self.grid.coord_iter():
-            if (self.random.random() < density and y == 49):
+            if (self.random.random() < density):
                 # Se crea una celula
                 new_cell = CellCell((x, y), self)
                 # Celula nueva se posiciona en el grid
@@ -47,7 +46,7 @@ class AutomataCelular(Model):
                 # Se agrega la celula nueva al scheduler
                 self.schedule.add(new_cell)
                 
-            # Esto hace que todas las celulas que no estén en Y = 49 estén muertas
+            # Esto hace que todas las celulas que no estén vivas esten muertas y no en None
             else:
                 new_cell = CellCell((x, y), self)
                 new_cell.condition = "Dead"
@@ -61,12 +60,6 @@ class AutomataCelular(Model):
         # El scheduler avanza cada celula por un paso y se guardan los datos en el datacollector
         self.schedule.step()
         self.datacollector.collect(self)
-
-        # Cada que se hace un paso, se suma 1 al contador
-        # Cuando llega al paso 49 (o sea al final del grid), se detiene la simulación
-        # self.i += 1
-        # if self.i >= 49:
-        #     self.running = False
 
     @staticmethod
     def count_type(model, cell_condition):

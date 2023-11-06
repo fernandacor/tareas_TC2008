@@ -30,20 +30,17 @@ class CellCell(Agent):
         """
         Constructor para definir el siguiente estado de la celula
         """
-        # Revisa si la celula esta muerta y si su posicion en Y es igual o menor a 49 
-        if self.condition == "Dead" or self.condition == "Alive":
-          
-        # Revisa si la posición de la celula es igual o menor a 49 
-        #if self.pos[1] <= 49:
-            neighbors = [] # Si si, se inicializa una lista vacia para los vecinos de la celula
+        
+        # Lista vacía para los vecinos de la celula
+        neighbors = []
             
-            # self.model.grit.iter_neighbors sirve para iterar sobre los vecinos de la celula
-            # True indica que también se incluyen los vecinos diagonales
-            for neighbor in self.model.grid.iter_neighbors(self.pos, True):
-                # Revisa que la posición del vecino sea directamente arriba de la celula
-                if neighbor.pos[1] == self.pos[1] + 1:
-                    # Si si, se agrega a la lista de vecinos
-                    neighbors.append(neighbor)
+        # self.model.grit.iter_neighbors sirve para iterar sobre los vecinos de la celula
+        # True indica que también se incluyen los vecinos diagonales
+        for neighbor in self.model.grid.iter_neighbors(self.pos, True):
+            # Revisa que la posición del vecino en relación al self
+            if neighbor.pos[0] or neighbor.pos[1] == self.pos[0] + 1:
+                # Si si, se agrega a la lista de vecinos
+                neighbors.append(neighbor)
             
             # Si la lista de vecinos tiene 3 elementos, se revisan las condiciones para el sig estado   
             if len(neighbors) == 3:
@@ -61,12 +58,12 @@ class CellCell(Agent):
                     (neighbors[0].condition == "Alive" and
                     neighbors[1].condition == "Dead" and
                     neighbors[2].condition == "Dead") or
-                    
+                        
                     # 1 1 0
                     (neighbors[0].condition == "Alive" and
                     neighbors[1].condition == "Alive" and
                     neighbors[2].condition == "Dead")):
-                    
+                        
                     self._next_condition = "Alive"
                 else:
                     self._next_condition = "Dead"
