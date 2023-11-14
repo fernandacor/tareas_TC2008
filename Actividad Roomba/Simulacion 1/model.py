@@ -2,71 +2,51 @@ import mesa
 from mesa import Model, DataCollector
 from mesa.space import SingleGrid
 from mesa.time import SimultaneousActivation 
+from mesa.time import RandomActivation
+from mesa.space import MultiGrid
+from mesa.datacollection import DataCollector
 
-from agent import CellCell
+import random
 
-class AutomataCelular(Model):
-    """
-        Simulación 1 - Modelo de un Automata Celular
-        
-        Atributos:
-            height, width: Tamaño del grid
-            density: Porcentaje de celdas que tienen células vivas
-    """
+from agent import CleanerAgent
 
-    def __init__(self, height=50, width=50, density=0.65):
-        """
-        Inicializar simulador.
-        
-        Argumentos:
-            height, width: Tamaño del grid del modelo
-            density: Porcentaje de celdas que tienen células vivas
-        """
-        
-        # Definir objetos del modelo
-        self.schedule = SimultaneousActivation(self) # Objeto de mesa que corre todos los agentes al mismo tiempo
-        self.grid = SingleGrid(height, width, torus=False) # Torus define si "the grid wraps or not"
-        self.i = 0 # Contador de pasos
+class CleaningModel(Model):
+    def __init__(self, width = 10, height = 10, num_agents = 1):
+        self.num_agents = num_agents
+        self.grid = MultiGrid(width, height, True)
+        self.schedule = RandomActivation(self)
 
-        # DatatCollector es un objeto de mesa que sirve para recolectar datos del modelo
+        # Create charging station at position (1, 1)
+        charging_station = CleanerAgent(0, self)
+        self.grid.place_agent(charging_station, (1, 1))
+        self.schedule.add(charging_station)
+
+        # Initialize dirty cells
+        for _ in range(int(0.2 * width * height)):
+            x = random.randrange(width)
+            y = random.randrange(height)
+            cell = self.grid[x][y]
+            cell['clean'] = False
+
+            # Add obstacle with 10% probability
+            if random.random() < 0.1:
+                cell['obstacle'] = True
+
+        # Create cleaner agents
+        for i in range(1, num_agents + 1):
+            agent = CleanerAgent(i, self)
+            x = random.randrange(width)
+            y = random.randrange(height)
+            self.grid.place_agent(agent, (x, y))
+            self.schedule.add(agent)
+
         self.datacollector = DataCollector(
-            {
-                "Alive": lambda m: self.count_type(m, "Alive"),
-                "Dead": lambda m: self.count_type(m, "Dead")
-            }
+            agent_reporters={"Battery": "battery"}
         )
 
-        # La densidad basicamente es la probabilidad de que haya una celula viva
-        # coord_iter itera sobre, y regresa, las posiciones y el contenido de cada celda
-        for contents, (x, y) in self.grid.coord_iter():
-            if (self.random.random() < density and y == 49):
-                # Se crea una celula
-                new_cell = CellCell((x, y), self)
-                # Celula nueva se posiciona en el grid
-                self.grid.place_agent(new_cell, (x, y))
-                # Se agrega la celula nueva al scheduler
-                self.schedule.add(new_cell)
-                
-            # Esto hace que todas las celulas que no estén en Y = 49 estén muertas
-            else:
-                new_cell = CellCell((x, y), self)
-                new_cell.condition = "Dead"
-                self.grid.place_agent(new_cell, (x, y))
-                self.schedule.add(new_cell)
-
-        self.running = True # Correr simulación
-        self.datacollector.collect(self) # Recolectar datos del modelo
-
     def step(self):
-        # El scheduler avanza cada celula por un paso y se guardan los datos en el datacollector
-        self.schedule.step()
         self.datacollector.collect(self)
-
-        # Cada que se hace un paso, se suma 1 al contador
-        # Cuando llega al paso 49 (o sea al final del grid), se detiene la simulación
-        self.i += 1
-        if self.i >= 49:
-            self.running = False
+        self.schedule.step()
 
     @staticmethod
     def count_type(model, cell_condition):

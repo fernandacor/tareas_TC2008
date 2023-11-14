@@ -3,7 +3,7 @@ from mesa import Model, DataCollector
 from mesa.space import SingleGrid
 from mesa.time import SimultaneousActivation 
 
-from agent import CellCell
+from sim1_agent import CellCell
 
 class AutomataCelular(Model):
     """

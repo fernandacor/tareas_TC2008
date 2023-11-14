@@ -6,25 +6,25 @@ from mesa.visualization import CanvasGrid, ChartModule, PieChartModule
 from mesa.visualization import ModularServer
 from mesa.visualization import Slider
 
-from model import AutomataCelular
+from model import CleaningModel
 
 # Los colores dependen del estado de las células
-COLORS = {"Alive": "#000000", "Dead": "#FFFFFF"}
+COLORS = {"Dirty": "#000000", "Clean": "#FF0000"}
 
 # Diccionario para generar la visualización del simulador
-def cell_automaton_portrayal(cell):
-    if cell is None:
+def grid(celda):
+    if celda is None:
         return
     portrayal = {"Shape": "rect", "w": 1, "h": 1, "Filled": "true", "Layer": 0}
-    (x, y) = cell.pos
+    (x, y) = celda.pos
     portrayal["x"] = x
     portrayal["y"] = y
-    portrayal["Color"] = COLORS[cell.condition]
+    portrayal["Color"] = COLORS[celda.condition]
 
     return portrayal
 
 #nombreVariable = CanvasGrid(portrayal, grid_row, grid_columns, canvas_width, canvas_height)
-canvas_element = CanvasGrid(cell_automaton_portrayal, 50, 50, 500, 500)
+canvas_element = CanvasGrid(grid, 10, 10, 500, 500)
 
 # Grafica para mostrar el número de células vivas y muertas con respecto al tiempo
 tree_chart = ChartModule(
@@ -38,12 +38,14 @@ pie_chart = PieChartModule(
 
 # The model parameters will be set by sliders controlling the initial density
 model_params = {
-    "height": 50,
-    "width": 50,
-    "density": Slider("Cell density", 0.15, 0.01, 0.5, 0.01),
+    "height": 10,
+    "width": 10,
+    # <nombre>: Slider(<label>, <default>, <min_value>, <max_value>, <step_size>)
+    "dirtyCells": Slider("Dirty cells", 0.15, 0.01, 0.5, 0.01),
+    "obstacules": Slider("Obstacules", 0.15, 0.01, 0.5, 0.01),
 }
 
 # Definir qué se va a mostrar en la página al mismo tiempo y que se actualicen cuando el usuario interactue
-server = ModularServer(AutomataCelular, [canvas_element, tree_chart, pie_chart], "Automata Celular Simulación 1 - A01782232", model_params)
+server = ModularServer(CleaningModel, [canvas_element, tree_chart, pie_chart], "Actividad Roomba - Simulación 1", model_params)
 
 server.launch()
