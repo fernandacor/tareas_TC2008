@@ -20,8 +20,8 @@ def calculoVertices(lados, radio, ancho):
     # Iterar por el número de lados para calcular los vertices usando el angulo
     for i in range(lados):
         #lista.append(x, y, z)
-        vertices.append((radio * math.cos(math.radians(360/lados)*(i+1)), radio * math.sin(math.radians(360/lados)*(i+1)), 0))
-        vertices.append((radio * math.cos(math.radians(360/lados)*(i+1)), radio * math.sin(math.radians(360/lados)*(i+1)), ancho))
+        vertices.append((0, radio * math.cos(math.radians(360/lados)*(i+1)), radio * math.sin(math.radians(360/lados)*(i+1))))
+        vertices.append((ancho, radio * math.cos(math.radians(360/lados)*(i+1)), radio * math.sin(math.radians(360/lados)*(i+1))))
     
     return vertices
 
@@ -46,7 +46,7 @@ def calculoCaras(lados, vertices, ancho):
     # Cara "Trasera":
     # Centro y origen de cara B
     centroB = centroA + 1
-    vertices.append((0, 0, ancho))
+    vertices.append((ancho, 0, 0))
     # Generar cara B
     for i in range(1, lados * 2, 2):
         caras.append((centroB, i, (i + 2) % (lados * 2)))
