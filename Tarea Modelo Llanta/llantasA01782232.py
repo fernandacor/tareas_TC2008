@@ -29,15 +29,11 @@ def calculoVertices(lados, radio, ancho):
 def calculoCaras(lados, vertices, ancho):
     # Inicializar lista para almacenar las caras
     caras = []
-    
-    # Origen de las caras
-    centroA = len(vertices)
-    centroB = centroA + 1
-    vertices.append((0, 0, 0))
-    vertices.append((0, 0, ancho))
 
     # Cara "Frontal":
-    # Centro de cara A
+    # Centro y origen de cara A
+    centroA = len(vertices)
+    vertices.append((0, 0, 0))
     # Generar cara A
     for i in range(0, lados * 2, 2):
         caras.append((centroA, (i + 2) % (lados * 2), i))
@@ -48,7 +44,9 @@ def calculoCaras(lados, vertices, ancho):
         caras.append((i, (i + 2) % (lados * 2), (i + 3) % (lados * 2), i + 1))
 
     # Cara "Trasera":
-    # Centro de cara B
+    # Centro y origen de cara B
+    centroB = centroA + 1
+    vertices.append((0, 0, ancho))
     # Generar cara B
     for i in range(1, lados * 2, 2):
         caras.append((centroB, i, (i + 2) % (lados * 2)))
