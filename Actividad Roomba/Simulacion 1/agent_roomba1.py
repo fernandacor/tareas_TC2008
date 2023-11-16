@@ -81,12 +81,6 @@ class RoombaAgent(Agent):
             
     def step(self):
         self.move()
-
-def clean(self):
-    if self.model.is_dirty(self.row, self.col):
-        self.battery -= 1
-        self.model.clean_cell(self.row, self.col)
-        self.movements += 1  
    
 class EmptyCellAgent(Agent):
     """
