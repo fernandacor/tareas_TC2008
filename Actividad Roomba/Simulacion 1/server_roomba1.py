@@ -1,53 +1,75 @@
-from model_roomba1 import RoombaModel, ObstacleAgent, DirtAgent, ChargingStationAgent
+# MA Actividad: Roomba
+# Simulación 1 - Server
+# Fernanda Cantú Ortega A01782232
+
+# Librerías a utilizar
+from model_roomba1 import RoombaModel, Obstacle_Agent, DirtyCell_Agent, ChargingStation_Agent
 from mesa.visualization import CanvasGrid, BarChartModule
 from mesa.visualization import ModularServer
 from mesa.visualization import Slider
 
-M = 15
-N = 15
-
+# Función para definir como se va a mostrar cada agente
 def agent_portrayal(agent):
+    # Agente limpiador
     if agent is None: return
-    
     portrayal = {"Shape": "circle",
                  "Filled": "true",
                  "Layer": 1,
-                 "Color": "black",
+                 "Color": "red",
                  "r": 0.5}
-
-    if (isinstance(agent, ObstacleAgent)):
-        portrayal["Color"] = "maroon"
+    
+    # Obstáculos
+    if (isinstance(agent, Obstacle_Agent)):
+        portrayal["Shape"] = "rect"  
+        portrayal["Filled"] = True
+        portrayal["Color"] = "gray"
         portrayal["Layer"] = 2
-        portrayal["Shape"] = "rect"  # Cambiar la forma a cuadrado
-        portrayal["w"] = 0.8  # Ancho del cuadrado
-        portrayal["h"] = 0.8  # Altura del cuadrado
+        portrayal["w"] = 1
+        portrayal["h"] = 1
 
-    if (isinstance(agent, ChargingStationAgent)):
-        portrayal["Color"] = "blue"
-        portrayal["Layer"] = 0
-        portrayal["Shape"] = "rect"  # Cambiar la forma a cuadrado
-        portrayal["w"] = 1  # Ancho del cuadrado
-        portrayal["h"] = 1  # Altura del cuadrado
-        
-    if (isinstance(agent, DirtAgent)):
-        portrayal["Color"] = "grey"
+    # Celdas sucias   
+    if (isinstance(agent, DirtyCell_Agent)):
+        portrayal["Shape"] = "circle"
+        portrayal["Filled"] = True
+        portrayal["Color"] = "darkgreen"
         portrayal["Layer"] = 0
         portrayal["r"] = 0.3
 
+    # Estación de carga
+    if (isinstance(agent, ChargingStation_Agent)):
+        portrayal["Shape"] = "circle"
+        portrayal["Filled"] = True
+        portrayal["Color"] = "yellow"
+        portrayal["Layer"] = 0
+        portrayal["r"] = 0.9
+         
     return portrayal
 
-model_params = {"DirtN": Slider("Dirt Amount", 20, 1, M*(M/4), 1), 
-                "ObsN": Slider("Obstacles Amount", 10, 1, N*(N/4), 1), 
-                "width":M,
-                "height":N}
+# Definición de los parametros del modelo
+model_params = {
+    # Tamaño del grid
+    "width": 15, 
+    "height": 15,
+    # Sliders para modificar el número de obstáculos, celdas sucias, agentes y tiempo máximo de ejecución
+    # "numAgents": 1,
+    #"numAgents": Slider("Agents", 3, 1, 10, 1),
+    "numObstacles": Slider("Obstacles", 20, 1, 15*(15/4), 1),
+    "numDirtyCells": Slider("Dirty Cells", 10, 1, 15*(15/4), 1),
+    # "maxSteps": Slider("Max Steps", 100, 1, 1000, 1)
+    }
 
-grid = CanvasGrid(agent_portrayal, M, N, 500, 500)
+# Definición de la visualización
+grid = CanvasGrid(agent_portrayal, 15, 15, 500, 500)
 
+# Gráfica para mostrar el tiempo necesario hasta que todas las celdas estén limpias
+# Gráfica para mostrar el porcentaje de celdas limpias después del termino de la simulación
+# Gráfica de barras para mostrar pasos del agente limpiador
 bar_chart = BarChartModule(
     [{"Label":"Steps", "Color":"#AA0000"}], 
     scope="agent", sorting="ascending", sort_by="Steps")
 
-server = ModularServer(RoombaModel, [grid, bar_chart], "Roomba", model_params)
+# Definición del servidor
+server = ModularServer(RoombaModel, [grid, bar_chart], "Roomba Simulación 1 - A01782232", model_params)
                        
-server.port = 8521 # The default
+server.port = 8521
 server.launch()
