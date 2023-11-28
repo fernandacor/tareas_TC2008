@@ -7,7 +7,7 @@ from mesa.visualization import CanvasGrid, ChartModule, PieChartModule
 from mesa.visualization import ModularServer
 from mesa.visualization import Slider
 
-from model import AutomataCelular
+from sim2_model import AutomataCelular # corregí el nombre del archivo
 
 # Los colores dependen del estado de las células
 COLORS = {"Alive": "#000000", "Dead": "#FFFFFF"}

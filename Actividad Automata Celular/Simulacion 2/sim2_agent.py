@@ -23,7 +23,7 @@ class CellCell(Agent):
         """
         super().__init__(pos, model) # super() permite accesar a los metodos de la clase padre
         self.pos = pos # posicion de la celula en el grid
-        self.condition = "Alive" or "Dead" # se inicializa como viva la celula
+        self.condition = "Alive" # se inicializa como viva la celula
         self._next_condition = None # se inicializa como None el siguiente estado de la celula
 
     def step(self):
@@ -38,35 +38,37 @@ class CellCell(Agent):
         # True indica que también se incluyen los vecinos diagonales
         for neighbor in self.model.grid.iter_neighbors(self.pos, True):
             # Revisa que la posición del vecino en relación al self
-            if neighbor.pos[0] or neighbor.pos[1] == self.pos[0] + 1:
+            if neighbor.pos[1] == self.pos[1] + 1: # corregí esto porque no se por que tenía que también checara la posición de x del vecino
                 # Si si, se agrega a la lista de vecinos
                 neighbors.append(neighbor)
+            elif neighbor.pos[1] == 0 and self.pos[1] == 49: # corregí esto para que los neighbors de hasta arriba revisen los de hasta abajo
+                neighbors.append(neighbor)
             
-            # Si la lista de vecinos tiene 3 elementos, se revisan las condiciones para el sig estado   
-            if len(neighbors) == 3:
-                    # 0 0 1
-                if ((neighbors[0].condition == "Dead" and 
-                    neighbors[1].condition == "Dead" and
-                    neighbors[2].condition == "Alive") or
+        # Si la lista de vecinos tiene 3 elementos, se revisan las condiciones para el sig estado   
+        if len(neighbors) == 3:
+                # 0 0 1
+            if ((neighbors[0].condition == "Dead" and 
+                neighbors[1].condition == "Dead" and
+                neighbors[2].condition == "Alive") or
+                
+                # 0 1 1
+                (neighbors[0].condition == "Dead" and
+                neighbors[1].condition == "Alive" and
+                neighbors[2].condition == "Alive") or
+                
+                # 1 0 0
+                (neighbors[0].condition == "Alive" and
+                neighbors[1].condition == "Dead" and
+                neighbors[2].condition == "Dead") or
                     
-                    # 0 1 1
-                    (neighbors[0].condition == "Dead" and
-                    neighbors[1].condition == "Alive" and
-                    neighbors[2].condition == "Alive") or
+                # 1 1 0
+                (neighbors[0].condition == "Alive" and
+                neighbors[1].condition == "Alive" and
+                neighbors[2].condition == "Dead")):
                     
-                    # 1 0 0
-                    (neighbors[0].condition == "Alive" and
-                    neighbors[1].condition == "Dead" and
-                    neighbors[2].condition == "Dead") or
-                        
-                    # 1 1 0
-                    (neighbors[0].condition == "Alive" and
-                    neighbors[1].condition == "Alive" and
-                    neighbors[2].condition == "Dead")):
-                        
-                    self._next_condition = "Alive"
-                else:
-                    self._next_condition = "Dead"
+                self._next_condition = "Alive"
+            else:
+                self._next_condition = "Dead"
     
     def advance(self):
         """

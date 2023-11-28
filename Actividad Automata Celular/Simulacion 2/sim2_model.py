@@ -3,7 +3,7 @@ from mesa import Model, DataCollector
 from mesa.space import SingleGrid
 from mesa.time import SimultaneousActivation 
 
-from agent import CellCell
+from sim2_agent import CellCell # corregí el nombre del archivo
 
 class AutomataCelular(Model):
     """
@@ -25,7 +25,7 @@ class AutomataCelular(Model):
         
         # Definir objetos del modelo
         self.schedule = SimultaneousActivation(self) # Objeto de mesa que corre todos los agentes al mismo tiempo
-        self.grid = SingleGrid(height, width, torus=False) # Torus define si "the grid wraps or not"
+        self.grid = SingleGrid(height, width, torus=True) # corregí que torus sea verdadero
 
         # DatatCollector es un objeto de mesa que sirve para recolectar datos del modelo
         self.datacollector = DataCollector(
@@ -41,6 +41,7 @@ class AutomataCelular(Model):
             if (self.random.random() < density):
                 # Se crea una celula
                 new_cell = CellCell((x, y), self)
+                new_cell.condition = "Alive"
                 # Celula nueva se posiciona en el grid
                 self.grid.place_agent(new_cell, (x, y))
                 # Se agrega la celula nueva al scheduler
