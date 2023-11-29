@@ -93,7 +93,7 @@ def generarArchivo(vertices, caras, normales):
         for cara in caras:
             outputFile.write("f")
             for vertice in cara:
-                outputFile.write(" {}/{}".format(vertice + 1, vertice + 1))
+                outputFile.write(" {}//{}".format(vertice + 1, vertice + 1))
             outputFile.write("\n")
 
 def main():
