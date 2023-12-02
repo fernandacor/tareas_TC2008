@@ -5,83 +5,106 @@ using UnityEngine;
 
 public class ApplyTransforms : MonoBehaviour
 {
-    [SerializeField] Object[] wheels;
     [SerializeField] Vector3 displacement;
     [SerializeField] float rotationSpeed;
     [SerializeField] AXIS rotationAxis;
 
-    Mesh[] meshs;
-    Vector3[][] baseVertices;
-    Vector3[][] newVertices;
+    Mesh carMesh;
+    Vector3[] car_baseVertices;
+    Vector3[] car_newVertices;
 
+    [SerializeField] Object[] wheels;
+    Mesh wheelMesh;
+    Vector3[][] wheel_baseVertices;
+    Vector3[][] wheel_newVertices;
 
     // Start is called before the first frame update
     void Start()
     {
-        meshs = new Mesh[5];
-        baseVertices = new Vector3[5][];
-        newVertices = new Vector3[5][];
+        // Conseguir mesh y vertices del coche, y copiar vertices originales
+        carMesh = GetComponentInChildren<MeshFilter>().mesh;
+        car_baseVertices = carMesh.vertices;
+        car_newVertices = new Vector3[car_baseVertices.Length];
 
-        meshs[0] = GetComponentInChildren<MeshFilter>().mesh;
-        for (int i = 1; i < 5; i++)
+        for (int i = 0; i < car_baseVertices.Length; i++) 
         {
-            meshs[i] = wheels[i - 1].GetComponentInChildren<MeshFilter>().mesh;
+            car_newVertices[i] = car_baseVertices[i];
         }
 
-        for (int i = 0; i < meshs.Length; i++)
+        // wheelMesh = GetComponentInChildren<MeshFilter>().mesh;
+        // wheel_baseVertices = wheelMesh.vertices;
+        // wheel_newVertices = new Vector3[wheel_baseVertices.Length];
+
+        wheel_baseVertices = new Vector3[wheels.Length][];
+        for (int i = 0; i < wheels.Length; i++) 
         {
+            wheelMesh = wheels[i].GetComponentInChildren<MeshFilter>().mesh;
+            wheel_baseVertices[i] = wheelMesh.vertices;
+        }
 
-            baseVertices[i] = meshs[i].vertices;
-
-            newVertices[i] = new Vector3[baseVertices[i].Length];
-            for (int j = 0; j < baseVertices.Length; j++)
-            {
-                newVertices[i][j] = baseVertices[i][j];
+        wheel_newVertices = new Vector3[wheels.Length][];
+        for (int i = 0; i < wheels.Length; i++) {
+            wheel_newVertices[i] = new Vector3[wheel_baseVertices[i].Length];
+            for (int j = 0; j < wheel_baseVertices[i].Length; j++) {
+                wheel_newVertices[i][j] = wheel_baseVertices[i][j];
             }
         }
-
     }
 
-    // Update is called once per frame
     void Update()
     {
+        // Llamar cada frame
         DoTransform();
     }
 
+    // Función para aplicar transformaciones
     void DoTransform()
     {
-        for (int i = 0; i < meshs.Length; i++)
+        // Transformaciones al coche:
+        // Matriz para trasladar un objeto
+        Matrix4x4 move = HW_Transforms.TranslationMat(displacement.x * Time.time,
+                                                        displacement.y * Time.time,
+                                                        displacement.z * Time.time);
+
+        // Multiplicar cada vertice del coche por la matriz de traslación
+        for (int i = 0; i < car_newVertices.Length; i++)
         {
-            Matrix4x4 move = HW_Transforms.TranslationMat(displacement.x * Time.time,
-                                                            displacement.y * Time.time,
-                                                            displacement.z * Time.time);
+            Vector4 temp = new Vector4(car_baseVertices[i].x,
+                                       car_baseVertices[i].y,
+                                       car_baseVertices[i].z,
+                                       1);
 
-            Matrix4x4 moveOrigin = HW_Transforms.TranslationMat(-displacement.x,
-                                                                -displacement.y,
-                                                                -displacement.z);
+            car_newVertices[i] = move * temp;
+        }
+        
+        carMesh.vertices = car_newVertices;
+        carMesh.RecalculateNormals();
 
-            Matrix4x4 moveObject = HW_Transforms.TranslationMat(displacement.x,
-                                                                displacement.y,
-                                                                displacement.z);
-
+        // Transformaciones a las llantas:
+        // Ciclo para recorrer todas las llantas
+        for (int i = 0; i < wheels.Length; i++)
+        {
+            // Matriz para rotar un objeto
             Matrix4x4 rotate = HW_Transforms.RotateMat(rotationSpeed * Time.time, rotationAxis);
+            
+            // Matriz para moverse y rodar
+            Matrix4x4 composite = move * rotate;
+            // if (i > 0)
+            //     composite *= rotate;
 
-            Matrix4x4 composite = move;
-            if (i > 0)
-                composite *= rotate;
-
-            for (int j = 0; j < newVertices[i].Length; j++)
+            // Multiplicar cada vertice de las llantas por la matriz compuesta
+            for (int j = 0; j < wheel_newVertices[i].Length; j++)
             {
-                Vector4 temp = new Vector4(baseVertices[i][j].x,
-                                            baseVertices[i][j].y,
-                                            baseVertices[i][j].z,
-                                            1);
+                Vector4 temp = new Vector4(wheel_baseVertices[i][j].x,
+                                           wheel_baseVertices[i][j].y,
+                                           wheel_baseVertices[i][j].z,
+                                           1);
 
-                newVertices[i][j] = composite * temp;
-
+                wheel_newVertices[i][j] = composite * temp;
             }
-            meshs[i].vertices = newVertices[i];
-            meshs[i].RecalculateNormals();
+
+            wheels[i].GetComponentInChildren<MeshFilter>().mesh.vertices = wheel_newVertices[i];
+            wheels[i].GetComponentInChildren<MeshFilter>().mesh.RecalculateNormals();
         }
     }
 }
